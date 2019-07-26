@@ -19,6 +19,10 @@ class AuthController {
 
         return token;
     }
+
+    async checkUser({ request, auth }){
+        return auth.user;
+    }
 }
 
 module.exports = AuthController

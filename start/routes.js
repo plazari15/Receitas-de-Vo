@@ -23,5 +23,5 @@ Route.get('/', () => {
 Route.post('/register', 'AuthController.register')
 Route.post('/auth', 'AuthController.authenticate')
 
-// Route.post('/auth', 'AuthController.authenticate').middleware(['auth:jwt'])
+Route.get('/user', 'AuthController.checkUser').middleware(['auth:jwt'])
 // Route.post('/auth', 'AuthController.authenticate').middleware(['auth'])
