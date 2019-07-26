@@ -27,4 +27,8 @@ Route.group(() => {
   Route.get('/user', 'AuthController.checkUser').middleware(['auth:jwt'])
 }).prefix('/api/v1/auth')
 
+Route.group(() => {
+  Route.get('/all', 'CategoryController.getAll')
+}).prefix('/api/v1/categories')
+
 // Route.post('/auth', 'AuthController.authenticate').middleware(['auth'])
