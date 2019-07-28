@@ -20,7 +20,7 @@ class AuthController {
         return token;
     }
 
-    async checkUser({ request, auth }){
+    async checkUser({ auth }){
         return auth.user;
     }
 }
