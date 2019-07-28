@@ -12,33 +12,29 @@
 
 /** @type {import('@adonisjs/lucid/src/Factory')} */
 const Factory = use('Factory')
+const Category = use('App/Models/Category')
 
 class CategorySeeder {
   async run () {
 
     const data = [
       {
-        "email" : "plazari96@gmail.com",
-        "name" : "Pedro",
-        "password" : "PEDRO",
-        "username" : "plazari"
+        "name" : "BASICO",
+        "short_description" : "Receitas Simples para o dia a dia ",
       },
       {
-        "email" : "plazari96@gmail.com",
-        "name" : "Pedro",
-        "password" : "PEDRO",
-        "username" : "plazari"
+        "name" : "MEDIO",
+        "short_description" : "Receitas Medias para o dia a dia ",
       },
       {
-        "email" : "plazari96@gmail.com",
-        "name" : "Pedro",
-        "password" : "PEDRO",
-        "username" : "plazari"
+        "name" : "DIFICIL",
+        "short_description" : "Receitas Dificeis para o dia a dia ",
       }
     ];
 
-    const user = await User.create(data);
-
+    for(var i=0; i < data.length; i++){
+      await Category.create(data[i]);
+    }
   }
 }
 
