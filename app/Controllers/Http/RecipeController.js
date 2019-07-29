@@ -91,7 +91,18 @@ class RecipeController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
+  async show ({ params, response }) {
+    const { id } = params
+
+    const recipe = Recipe
+      .query()
+      .where('id', id)
+      .with('user')
+      .with('category')
+      .with('steps')
+      .fetch();
+
+    return recipe;
   }
 
   /**
