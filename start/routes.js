@@ -18,7 +18,7 @@ const Route = use('Route')
 
 require
 Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
+  return { greeting: 'Hello world in JSON WITH BUILD' }
 })
 
 Route.group(() => {
