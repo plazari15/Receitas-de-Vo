@@ -18,7 +18,7 @@ const Route = use('Route')
 
 require
 Route.get('/', () => {
-  return { greeting: 'Hello world in JSON Teste Jenkins 2' }
+  return { greeting: 'Hello world in JSON Teste Jenkins FUNCIONANDO!!' }
 })
 
 Route.group(() => {
