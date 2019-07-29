@@ -7,8 +7,20 @@ class RecipesSchema extends Schema {
   up () {
     this.create('recipes', (table) => {
       table.increments()
-      table.integer('user_id').unsigned().references('id').inTable('users');
-      table.integer('category_id').unsigned().references('id').inTable('categories');
+      table
+        .integer('user_id')
+        .unsigned()
+        .references('id')
+        .inTable('users')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE')
+      table
+        .integer('category_id')
+        .unsigned()
+        .references('id')
+        .inTable('categories')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE')
       table.string('name');
       table.string('short_description');
       table.text('description');
