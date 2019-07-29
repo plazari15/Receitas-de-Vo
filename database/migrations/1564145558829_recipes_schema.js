@@ -22,8 +22,6 @@ class RecipesSchema extends Schema {
         .onUpdate('CASCADE')
         .onDelete('CASCADE')
       table.string('name');
-      table.string('short_description');
-      table.text('description');
       table.string('photo');
       table.integer('status')
       table.timestamps()
