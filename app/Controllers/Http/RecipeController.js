@@ -1,6 +1,7 @@
 'use strict'
 
 const Recipe = use('App/Models/Recipe');
+const Database = use('Database')
 
 
 /**
@@ -33,9 +34,21 @@ class RecipeController {
     } 
 
     if(user !== undefined){
-      data = await Recipe.query()
-      .where('user_id', user)
-      .fetch();
+      data = await Database
+        .select([
+          'recipes.id AS recipe_id',
+          'recipes.photo AS recipe_photo',
+          'recipes.status AS  status',
+          'recipes.name AS recipe',
+          'recipes.created_at As recipe_create',
+          'users.username AS username',
+          'users.picture AS user_pic',
+          'categories.name AS category'
+        ])
+        .table('recipes')
+        .innerJoin('users', 'users.id', 'recipes.user_id')
+        .innerJoin('categories', 'categories.id', 'recipes.category_id')
+        .where('users.username', user)
     }
     
     if(index !== undefined){
@@ -50,11 +63,11 @@ class RecipeController {
       }
     }
 
-    return {
+    return response.status(404).send({
       "success" : true,
       "message" : null,
       "body"    : data
-    }
+    })
 
   }
 
