@@ -12,9 +12,10 @@ WORKDIR /var/www
 COPY package*.json .
 RUN npm install
 
+ARG HOST_PORT
 
 ENV HOST=0.0.0.0
-ENV PORT=8000
+ENV PORT=${HOST_PORT}
 ENV NODE_ENV=development
 ENV APP_NAME=AdonisJs
 ENV APP_URL=http://${HOST}:${PORT}
@@ -32,7 +33,7 @@ ENV DEBUG=adonis:*
 
 COPY . .
 
-EXPOSE 8000
+EXPOSE ${HOST_PORT}
 
 RUN ["chmod", "+x", "./scripts/run.sh"]
 ENTRYPOINT [ "./scripts/run.sh" ]
