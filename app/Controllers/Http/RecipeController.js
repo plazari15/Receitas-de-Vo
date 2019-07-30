@@ -27,11 +27,11 @@ class RecipeController {
     var data = [];
 
     if(category !== undefined){
-     data = await Recipe.query().where('category_id', category).fetch();
+     data = await Recipe.query().where('category_id', category).with('user').fetch();
     }
 
     if(term !== undefined){
-      data = await Recipe.query().where('name', 'LIKE', term).fetch();
+      data = await Recipe.query().where('name', 'LIKE', term).with('user').fetch();
     }
 
     if(user !== undefined){
@@ -53,7 +53,7 @@ class RecipeController {
     }
 
     if(index !== undefined){
-      data = await Recipe.all();
+      data = await Recipe.query().with('user').fetch();
     }
 
     if(data.length > 0){
