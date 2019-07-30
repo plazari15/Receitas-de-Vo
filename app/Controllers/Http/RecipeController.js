@@ -3,6 +3,7 @@
 const Recipe = use('App/Models/Recipe');
 const Steps = use('App/Models/RecipesStep');
 const Database = use('Database')
+const { validate } = use('Validator')
 
 
 /**
@@ -81,6 +82,22 @@ class RecipeController {
    * @param {Response} ctx.response
    */
   async store ({ request, response, auth }) {
+    const rules = {
+      category_id : "required",
+      name : "required",
+      photo : "required"
+    }
+
+    const validation = await validate(request.all(), rules, {
+      'category_id.required' : "Selecione uma categoria.",
+      'name.required' : "Uma receita sem nome não funciona =(",
+      'photo.required' : "Todos devem saber como seu prato deve ficar. Poste uma foto!",
+    })
+
+    if (validation.fails()) {
+      return validation.messages();
+    }
+
     const {category_id, name, steps} = request.all();
 
     if(await !auth.check()){
