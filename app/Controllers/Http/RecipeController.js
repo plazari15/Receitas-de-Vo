@@ -1,6 +1,7 @@
 'use strict'
 
 const Recipe = use('App/Models/Recipe');
+const Steps = use('App/Models/RecipesStep');
 const Database = use('Database')
 
 
@@ -20,7 +21,7 @@ class RecipeController {
    * @param {View} ctx.view
    */
   async index ({ request, response }) {
-    
+
     const {category, term, user, index } = request.all();
 
     var data = [];
@@ -31,7 +32,7 @@ class RecipeController {
 
     if(term !== undefined){
       data = await Recipe.query().where('name', 'LIKE', term).fetch();
-    } 
+    }
 
     if(user !== undefined){
       data = await Database
@@ -50,11 +51,11 @@ class RecipeController {
         .innerJoin('categories', 'categories.id', 'recipes.category_id')
         .where('users.username', user)
     }
-    
+
     if(index !== undefined){
       data = await Recipe.all();
     }
-    
+
     if(data.length > 0){
       return {
         "success" : false,
@@ -79,7 +80,49 @@ class RecipeController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, response, auth }) {
+    const {category_id, name, steps} = request.all();
+
+    if(await !auth.check()){
+      return response
+      .status(401)
+      .send({
+        "error" : true,
+        "message" : "Somente usuários logados podem enviar"
+      });
+    }
+
+    const data = {
+      "user_id" : auth.user.id,
+      "category_id" : category_id,
+      "name" : name,
+      "photo" : "dfs",
+      "status" : "2"
+    }
+
+    const recipeCreated = await Recipe.create(data);
+
+    if(recipeCreated.id != ''){
+      steps.forEach(async element => {
+          const step = new Steps()
+          step.order = element.order;
+          step.description = element.description;
+
+          await recipeCreated.steps().save(step);
+      });
+    }
+
+
+    if(recipeCreated.id != ''){
+      return response
+      .status(201)
+      .send({
+        "error" : false,
+        "message" : "Receita criada. A publicação da mesma pode ocorrer em até 24 horas."
+      });
+    }
+
+
   }
 
   /**
