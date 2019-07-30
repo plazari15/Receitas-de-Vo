@@ -34,6 +34,7 @@ COPY . .
 
 EXPOSE 8000
 
+RUN ["chmod", "+x", "./scripts/run.sh"]
 ENTRYPOINT [ "./scripts/run.sh" ]
 #CMD [ "node", "server.js" ]
 
