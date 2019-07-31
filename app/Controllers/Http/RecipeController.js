@@ -213,15 +213,19 @@ class RecipeController {
 
 
     if(await getRecipe.save()){
-      return getRecipe;
-    //   steps.forEach(async element => {
-    //     const step = new Steps()
-    //     step.order = element.order;
-    //     step.description = element.description;
+      steps.forEach(async element => {
+        return element;
+        // var step = await Steps.query().where('id', element.id).andWhere('recipe_id', id).first();
+        // return element;
 
-    //     await recipeCreated.steps().save(step);
-    // });
+        // step.order = element.order;
+        // step.description = element.description;
+
+        // await Steps.save(step);
+
+    });
     }
+
     getRecipe.reload();
     return getRecipe;
   }
