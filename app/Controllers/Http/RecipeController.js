@@ -173,7 +173,57 @@ class RecipeController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({ params, request, response, auth }) {
+    const rules = {
+      id : "required",
+      category_id : "required",
+      name : "required",
+      photo : "required"
+    }
+
+    const validation = await validate(request.all(), rules, {
+      'id.required' : "Edite uma receita para começar",
+      'category_id.required' : "Selecione uma categoria.",
+      'name.required' : "Uma receita sem nome não funciona =(",
+      'photo.required' : "Todos devem saber como seu prato deve ficar. Poste uma foto!",
+    });
+
+    if (validation.fails()) {
+      return validation.messages();
+    }
+
+    const {category_id, name, steps, id, photo} = request.all();
+
+    const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', id).first();
+
+    if(!getRecipe.id){
+      return response
+      .status(405)
+      .send({
+        "error" : false,
+        "message" : "Opss! Essa receita não parece pertencer a você."
+      });
+    }
+
+    getRecipe.category_id = category_id;
+    getRecipe.name = name;
+    getRecipe.photo = photo;
+    getRecipe.status = 2;
+
+
+
+    if(await getRecipe.save()){
+      return getRecipe;
+    //   steps.forEach(async element => {
+    //     const step = new Steps()
+    //     step.order = element.order;
+    //     step.description = element.description;
+
+    //     await recipeCreated.steps().save(step);
+    // });
+    }
+    getRecipe.reload();
+    return getRecipe;
   }
 
   /**
