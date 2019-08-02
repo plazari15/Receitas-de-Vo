@@ -53,9 +53,9 @@ class RecipeController {
         .where('users.username', user)
     }
 
-
-    data = await Recipe.query().with('user').fetch();
-
+    if(index !== undefined){
+      data = await Recipe.query().with('user').fetch();
+    }
 
     if(data.length > 0){
       return {
