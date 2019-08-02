@@ -23,20 +23,20 @@ class RecipeController {
    */
   async index ({ request, response }) {
 
-    const {category, term, user, index } = request.all();
+    const {type, content } = request.all();
 
     var data = [];
 
-    if(category !== undefined){
-     data = await Recipe.query().where('category_id', category).with('user').fetch();
-    }
+    switch(type) {
+      case 'category':
+          data = await Recipe.query().where('category_id', content).with('user').fetch();
+          break;
 
-    if(term !== undefined){
-      data = await Recipe.query().where('name', 'LIKE', term).with('user').fetch();
-    }
-
-    if(user !== undefined){
-      data = await Database
+      case 'term':
+          data = await Recipe.query().where('name', 'LIKE', content).with('user').fetch();
+          break;
+      case 'user':
+        data = await Database
         .select([
           'recipes.id AS recipe_id',
           'recipes.photo AS recipe_photo',
@@ -50,14 +50,15 @@ class RecipeController {
         .table('recipes')
         .innerJoin('users', 'users.id', 'recipes.user_id')
         .innerJoin('categories', 'categories.id', 'recipes.category_id')
-        .where('users.username', user)
+        .where('users.username', content)
+        break;
+
+        default:
+            data = await Recipe.query().with('user').fetch();
+        break;
     }
 
-    if(index !== undefined){
-      data = await Recipe.query().with('user').fetch();
-    }
-
-    if(data.length > 0){
+    if(data.length <= 0){
       return response.status(404).send({
         "success" : false,
         "message" : "Nada encontrado. Tente novamente",
