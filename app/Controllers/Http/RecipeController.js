@@ -58,14 +58,14 @@ class RecipeController {
     }
 
     if(data.length > 0){
-      return {
+      return response.status(404).send({
         "success" : false,
         "message" : "Nada encontrado. Tente novamente",
         "body"    : data
-      }
+      })
     }
 
-    return response.status(404).send({
+    return response.status(200).send({
       "success" : true,
       "message" : null,
       "body"    : data
