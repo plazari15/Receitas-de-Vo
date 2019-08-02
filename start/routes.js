@@ -18,7 +18,7 @@ const Route = use('Route')
 
 require
 Route.get('/', () => {
-  return { greeting: 'Hello world in JSON' }
+  return { greeting: 'Hello world in JSON WITH BUILD' }
 })
 
 Route.group(() => {
@@ -26,6 +26,13 @@ Route.group(() => {
   Route.post('/login', 'AuthController.authenticate')
   Route.get('/user', 'AuthController.checkUser').middleware(['auth:jwt'])
 }).prefix('/api/v1/auth')
+
+Route.group(() => {
+
+  Route.resource('/recipes', 'RecipeController').apiOnly()
+
+}).prefix('/api/v1/')
+//.middleware(['auth:jwt'])
 
 Route.group(() => {
   Route.get('/all', 'CategoryController.getAll')
