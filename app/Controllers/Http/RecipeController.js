@@ -175,6 +175,7 @@ class RecipeController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response, auth }) {
+
     const rules = {
       id : "required",
       category_id : "required",
@@ -215,14 +216,12 @@ class RecipeController {
 
     if(await getRecipe.save()){
       steps.forEach(async element => {
-        return element;
-        // var step = await Steps.query().where('id', element.id).andWhere('recipe_id', id).first();
-        // return element;
+        var step = await Steps.query().where('id', element.id).andWhere('recipe_id', id).first();
 
-        // step.order = element.order;
-        // step.description = element.description;
+        step.order = element.order;
+        step.description = element.description;
 
-        // await Steps.save(step);
+        await step.save();
 
     });
     }

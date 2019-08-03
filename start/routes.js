@@ -32,7 +32,7 @@ Route.group(() => {
   Route.resource('/recipes', 'RecipeController').apiOnly()
 
 }).prefix('/api/v1/')
-//.middleware(['auth:jwt'])
+.middleware(['auth:jwt'])
 
 Route.group(() => {
   Route.get('/all', 'CategoryController.getAll')
