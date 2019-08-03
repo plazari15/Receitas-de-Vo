@@ -29,10 +29,10 @@ Route.group(() => {
 
 Route.group(() => {
 
-  Route.resource('/recipes', 'RecipeController').apiOnly()
+  Route.resource('/recipes', 'RecipeController').apiOnly().middleware(new Map([['store', 'update', 'destroy'], ['auth:jwt']]))
 
 }).prefix('/api/v1/')
-//.middleware(['auth:jwt'])
+
 
 Route.group(() => {
   Route.get('/all', 'CategoryController.getAll')

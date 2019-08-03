@@ -23,20 +23,20 @@ class RecipeController {
    */
   async index ({ request, response }) {
 
-    const {category, term, user, index } = request.all();
+    const {type, content } = request.all();
 
     var data = [];
 
-    if(category !== undefined){
-     data = await Recipe.query().where('category_id', category).with('user').fetch();
-    }
+    switch(type) {
+      case 'category':
+          data = await Recipe.query().where('category_id', content).with('user').fetch();
+          break;
 
-    if(term !== undefined){
-      data = await Recipe.query().where('name', 'LIKE', term).with('user').fetch();
-    }
-
-    if(user !== undefined){
-      data = await Database
+      case 'term':
+          data = await Recipe.query().where('name', 'LIKE', content).with('user').fetch();
+          break;
+      case 'user':
+        data = await Database
         .select([
           'recipes.id AS recipe_id',
           'recipes.photo AS recipe_photo',
@@ -50,14 +50,15 @@ class RecipeController {
         .table('recipes')
         .innerJoin('users', 'users.id', 'recipes.user_id')
         .innerJoin('categories', 'categories.id', 'recipes.category_id')
-        .where('users.username', user)
+        .where('users.username', content)
+        break;
+
+        default:
+            data = await Recipe.query().with('user').fetch();
+        break;
     }
 
-    if(index !== undefined){
-      data = await Recipe.query().with('user').fetch();
-    }
-
-    if(data.length > 0){
+    if(data.length <= 0){
       return response.status(404).send({
         "success" : false,
         "message" : "Nada encontrado. Tente novamente",
@@ -174,6 +175,7 @@ class RecipeController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response, auth }) {
+
     const rules = {
       id : "required",
       category_id : "required",
@@ -214,14 +216,12 @@ class RecipeController {
 
     if(await getRecipe.save()){
       steps.forEach(async element => {
-        return element;
-        // var step = await Steps.query().where('id', element.id).andWhere('recipe_id', id).first();
-        // return element;
+        var step = await Steps.query().where('id', element.id).andWhere('recipe_id', id).first();
 
-        // step.order = element.order;
-        // step.description = element.description;
+        step.order = element.order;
+        step.description = element.description;
 
-        // await Steps.save(step);
+        await step.save();
 
     });
     }
@@ -238,7 +238,39 @@ class RecipeController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({params, response, auth }) {
+    const {id} = params;
+    
+    try{
+      const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', id).first();
+
+      if(getRecipe.delete()){
+        return response
+        .status(200)
+        .send({
+          "error" : false,
+          "message" : "Ok! Receita excluída!"
+        });
+      }
+
+      return response
+        .status(400)
+        .send({
+          "error" : true,
+          "message" : "Oppss! Erro ao Excluir a Receita!"
+        });
+
+    }catch(e){
+      console.log(e.message);
+      return response
+      .status(404)
+      .send({
+        "error" : true,
+        "message" : "Oppss! A receita que você está tentando excluir não parece ser sua!"
+      });
+
+    }
+
   }
 }
 
