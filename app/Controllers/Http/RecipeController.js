@@ -238,7 +238,39 @@ class RecipeController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({params, response, auth }) {
+    const {id} = params;
+    
+    try{
+      const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', id).first();
+
+      if(getRecipe.delete()){
+        return response
+        .status(200)
+        .send({
+          "error" : false,
+          "message" : "Ok! Receita excluída!"
+        });
+      }
+
+      return response
+        .status(400)
+        .send({
+          "error" : true,
+          "message" : "Oppss! Erro ao Excluir a Receita!"
+        });
+
+    }catch(e){
+      console.log(e.message);
+      return response
+      .status(404)
+      .send({
+        "error" : true,
+        "message" : "Oppss! A receita que você está tentando excluir não parece ser sua!"
+      });
+
+    }
+
   }
 }
 
