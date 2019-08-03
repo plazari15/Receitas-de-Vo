@@ -4,6 +4,7 @@ const Recipe = use('App/Models/Recipe');
 const Steps = use('App/Models/RecipesStep');
 const Database = use('Database')
 const { validate } = use('Validator')
+const Driver = use('Drive')
 
 
 /**
@@ -69,7 +70,8 @@ class RecipeController {
     return response.status(200).send({
       "success" : true,
       "message" : null,
-      "body"    : data
+      "body"    : data,
+      "image" : await Driver.disk('s3').getUrl('214628.jpeg')
     })
 
   }
@@ -240,7 +242,7 @@ class RecipeController {
    */
   async destroy ({params, response, auth }) {
     const {id} = params;
-    
+
     try{
       const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', id).first();
 

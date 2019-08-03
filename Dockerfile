@@ -29,6 +29,10 @@ ENV DB_PASSWORD=api-receitas-vo-node
 ENV DB_DATABASE=api-receitas-vo-node
 ENV HASH_DRIVER=bcrypt
 ENV DEBUG=adonis:*
+ENV S3_KEY=AKIAZ52X32WFMJ65BGMV
+ENV S3_SECRET=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
+ENV S3_BUCKET=receitavo-fotos
+ENV S3_REGION=us-east-1
 
 
 COPY . .
