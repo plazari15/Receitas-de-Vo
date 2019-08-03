@@ -71,7 +71,6 @@ class RecipeController {
       "success" : true,
       "message" : null,
       "body"    : data,
-      "image" : await Driver.disk('s3').getUrl('214628.jpeg')
     })
 
   }
