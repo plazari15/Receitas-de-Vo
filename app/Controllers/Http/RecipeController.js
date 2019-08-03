@@ -87,13 +87,11 @@ class RecipeController {
     const rules = {
       category_id : "required",
       name : "required",
-      photo : "required"
     }
 
     const validation = await validate(request.all(), rules, {
       'category_id.required' : "Selecione uma categoria.",
       'name.required' : "Uma receita sem nome não funciona =(",
-      'photo.required' : "Todos devem saber como seu prato deve ficar. Poste uma foto!",
     })
 
     if (validation.fails()) {
@@ -115,7 +113,6 @@ class RecipeController {
       "user_id" : auth.user.id,
       "category_id" : category_id,
       "name" : name,
-      "photo" : "dfs",
       "status" : "2"
     }
 
