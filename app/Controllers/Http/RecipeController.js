@@ -71,7 +71,6 @@ class RecipeController {
       "success" : true,
       "message" : null,
       "body"    : data,
-      "image" : await Driver.disk('s3').getUrl('214628.jpeg')
     })
 
   }
@@ -88,13 +87,11 @@ class RecipeController {
     const rules = {
       category_id : "required",
       name : "required",
-      photo : "required"
     }
 
     const validation = await validate(request.all(), rules, {
       'category_id.required' : "Selecione uma categoria.",
       'name.required' : "Uma receita sem nome não funciona =(",
-      'photo.required' : "Todos devem saber como seu prato deve ficar. Poste uma foto!",
     })
 
     if (validation.fails()) {
@@ -116,8 +113,7 @@ class RecipeController {
       "user_id" : auth.user.id,
       "category_id" : category_id,
       "name" : name,
-      "photo" : "dfs",
-      "status" : "2"
+      "status" : "3"
     }
 
     const recipeCreated = await Recipe.create(data);
@@ -182,14 +178,12 @@ class RecipeController {
       id : "required",
       category_id : "required",
       name : "required",
-      photo : "required"
     }
 
     const validation = await validate(request.all(), rules, {
       'id.required' : "Edite uma receita para começar",
       'category_id.required' : "Selecione uma categoria.",
       'name.required' : "Uma receita sem nome não funciona =(",
-      'photo.required' : "Todos devem saber como seu prato deve ficar. Poste uma foto!",
     });
 
     if (validation.fails()) {
@@ -211,7 +205,6 @@ class RecipeController {
 
     getRecipe.category_id = category_id;
     getRecipe.name = name;
-    getRecipe.photo = photo;
     getRecipe.status = 2;
 
 
