@@ -5,7 +5,7 @@ const Steps = use('App/Models/RecipesStep');
 const Database = use('Database')
 const { validate } = use('Validator')
 const Driver = use('Drive')
-
+const { generatePhotoName } = use('App/Helpers')
 
 /**
  * Resourceful controller for interacting with recipes
@@ -134,9 +134,56 @@ class RecipeController {
       .status(201)
       .send({
         "error" : false,
-        "message" : "Receita criada. A publicação da mesma pode ocorrer em até 24 horas."
+        "message" : "Receita criada. A publicação da mesma pode ocorrer em até 24 horas.",
+        "recipe_id" : recipeCreated.id
       });
     }
+
+
+  }
+
+  async photoUpload({ params, request, response, auth }){
+    const { id } = params;
+
+    if(id === undefined){
+      return response
+      .status(404)
+      .send({
+        "error" : false,
+        "message" : "Receita não encontrada. A Foto não pode ser adicionada"
+      });
+    }
+
+    const profilePic = request.multipart.file('photo', {
+      types: ['image'],
+      size: '2mb'
+    }, async (file) => {
+      const fileName = await generatePhotoName(id, file.extname);
+      const recipe = await Recipe.find(id);
+
+      if(await Driver.disk('s3').exists(recipe.photo)){
+        console.log('Existe')
+        await Driver.disk('s3').delete(recipe.photo);
+      }
+
+      await Driver.disk('s3').put(fileName, file.stream, {
+        ACL : "public-read"
+      });
+
+      recipe.photo = fileName;
+      recipe.save();
+
+      return true;
+    })
+
+    await request.multipart.process();
+
+    return response
+    .status(201)
+    .send({
+      "error" : false,
+      "message" : "Foto inserida com sucesso!"
+    });
 
 
   }
