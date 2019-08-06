@@ -9,7 +9,7 @@ RUN mkdir /var/www
 
 WORKDIR /var/www
 
-COPY package*.json .
+COPY package*.json ./
 RUN npm install
 
 ARG HOST_PORT
