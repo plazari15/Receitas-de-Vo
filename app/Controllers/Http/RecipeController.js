@@ -161,7 +161,7 @@ class RecipeController {
       const fileName = await generatePhotoName(id, file.extname);
       const recipe = await Recipe.find(id);
 
-      if(!is_empty(recipe.photo) && await Driver.disk('s3').exists(recipe.photo)){
+      if(recipe.photo !== null && await Driver.disk('s3').exists(recipe.photo)){
         console.log('Existe')
         await Driver.disk('s3').delete(recipe.photo);
       }
