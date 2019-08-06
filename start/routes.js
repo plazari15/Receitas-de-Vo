@@ -34,6 +34,8 @@ Route.group(() => {
   .middleware(new Map([
     [['store', 'update', 'destroy'], ['auth:jwt']]
   ]))
+  Route.post('recipes/:id/photo', 'RecipeController.photoUpload')
+  .middleware('auth:jwt')
 
 }).prefix('/api/v1/')
 

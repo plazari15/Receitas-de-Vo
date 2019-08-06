@@ -5,7 +5,7 @@ const Steps = use('App/Models/RecipesStep');
 const Database = use('Database')
 const { validate } = use('Validator')
 const Driver = use('Drive')
-
+const { generatePhotoName } = use('App/Helpers')
 
 /**
  * Resourceful controller for interacting with recipes
@@ -71,7 +71,6 @@ class RecipeController {
       "success" : true,
       "message" : null,
       "body"    : data,
-      "image" : await Driver.disk('s3').getUrl('214628.jpeg')
     })
 
   }
@@ -88,13 +87,11 @@ class RecipeController {
     const rules = {
       category_id : "required",
       name : "required",
-      photo : "required"
     }
 
     const validation = await validate(request.all(), rules, {
       'category_id.required' : "Selecione uma categoria.",
       'name.required' : "Uma receita sem nome não funciona =(",
-      'photo.required' : "Todos devem saber como seu prato deve ficar. Poste uma foto!",
     })
 
     if (validation.fails()) {
@@ -116,8 +113,7 @@ class RecipeController {
       "user_id" : auth.user.id,
       "category_id" : category_id,
       "name" : name,
-      "photo" : "dfs",
-      "status" : "2"
+      "status" : "3"
     }
 
     const recipeCreated = await Recipe.create(data);
@@ -138,9 +134,56 @@ class RecipeController {
       .status(201)
       .send({
         "error" : false,
-        "message" : "Receita criada. A publicação da mesma pode ocorrer em até 24 horas."
+        "message" : "Receita criada. A publicação da mesma pode ocorrer em até 24 horas.",
+        "recipe_id" : recipeCreated.id
       });
     }
+
+
+  }
+
+  async photoUpload({ params, request, response, auth }){
+    const { id } = params;
+
+    if(id === undefined){
+      return response
+      .status(404)
+      .send({
+        "error" : false,
+        "message" : "Receita não encontrada. A Foto não pode ser adicionada"
+      });
+    }
+
+    const profilePic = request.multipart.file('photo', {
+      types: ['image'],
+      size: '2mb'
+    }, async (file) => {
+      const fileName = await generatePhotoName(id, file.extname);
+      const recipe = await Recipe.find(id);
+
+      if(await Driver.disk('s3').exists(recipe.photo)){
+        console.log('Existe')
+        await Driver.disk('s3').delete(recipe.photo);
+      }
+
+      await Driver.disk('s3').put(fileName, file.stream, {
+        ACL : "public-read"
+      });
+
+      recipe.photo = fileName;
+      recipe.save();
+
+      return true;
+    })
+
+    await request.multipart.process();
+
+    return response
+    .status(201)
+    .send({
+      "error" : false,
+      "message" : "Foto inserida com sucesso!"
+    });
 
 
   }
@@ -182,14 +225,12 @@ class RecipeController {
       id : "required",
       category_id : "required",
       name : "required",
-      photo : "required"
     }
 
     const validation = await validate(request.all(), rules, {
       'id.required' : "Edite uma receita para começar",
       'category_id.required' : "Selecione uma categoria.",
       'name.required' : "Uma receita sem nome não funciona =(",
-      'photo.required' : "Todos devem saber como seu prato deve ficar. Poste uma foto!",
     });
 
     if (validation.fails()) {
@@ -211,7 +252,6 @@ class RecipeController {
 
     getRecipe.category_id = category_id;
     getRecipe.name = name;
-    getRecipe.photo = photo;
     getRecipe.status = 2;
 
 
