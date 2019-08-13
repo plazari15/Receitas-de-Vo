@@ -18,6 +18,7 @@ class RecipeTagController {
    * @param {View} ctx.view
    */
   async index ({ request, response, view }) {
+
   }
 
   /**
@@ -90,4 +91,4 @@ class RecipeTagController {
   }
 }
 
-module.exports = RecipeTagController
+module.exports = TagController
