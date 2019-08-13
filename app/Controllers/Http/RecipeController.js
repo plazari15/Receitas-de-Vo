@@ -30,32 +30,29 @@ class RecipeController {
 
     switch(type) {
       case 'category':
-          data = await Recipe.query().where('category_id', content).with('user').fetch();
+          data = await Recipe
+            .query()
+            .where('category_id', content)
+            .with('user')
+            .with('tags')
+            .fetch();
           break;
 
       case 'term':
-          data = await Recipe.query().where('name', 'LIKE', content).with('user').fetch();
+          data = await Recipe
+          .query()
+          .where('name', 'LIKE', content)
+          .with('user')
+          .with('tags')
+          .fetch();
           break;
-      case 'user':
-        data = await Database
-        .select([
-          'recipes.id AS recipe_id',
-          'recipes.photo AS recipe_photo',
-          'recipes.status AS  status',
-          'recipes.name AS recipe',
-          'recipes.created_at As recipe_create',
-          'users.username AS username',
-          'users.picture AS user_pic',
-          'categories.name AS category'
-        ])
-        .table('recipes')
-        .innerJoin('users', 'users.id', 'recipes.user_id')
-        .innerJoin('categories', 'categories.id', 'recipes.category_id')
-        .where('users.username', content)
-        break;
 
         default:
-            data = await Recipe.query().with('user').fetch();
+            data = await Recipe
+            .query()
+            .with('user')
+            .with('tags')
+            .fetch();
         break;
     }
 
