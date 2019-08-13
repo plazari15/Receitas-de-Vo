@@ -4,6 +4,8 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
+const Recipe = use('App/Models/Recipe');
+
 /**
  * Resourceful controller for interacting with myrecipes
  */
@@ -18,51 +20,31 @@ class MyRecipeController {
    * @param {View} ctx.view
    */
   async index ({ request, response, auth }) {
-  }
+    const { id }  = auth.user;
 
-  /**
-   * Create/save a new myrecipe.
-   * POST myrecipes
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, response }) {
-  }
+    const allRecipe = await Recipe
+      .query()
+      .where('user_id', id)
+      .with('category')
+      .fetch();
 
-  /**
-   * Display a single myrecipe.
-   * GET myrecipes/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
-  }
+    if(allRecipe){
+      return response
+        .status(200)
+        .send({
+          'message' : "",
+          'success' : true,
+          'body' : allRecipe
+        });
+    }
 
-  /**
-   * Update myrecipe details.
-   * PUT or PATCH myrecipes/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
-  }
-
-  /**
-   * Delete a myrecipe with id.
-   * DELETE myrecipes/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
+    return response
+        .status(404)
+        .send({
+          'message' : "Nenhuma receita encontrada",
+          'success' : false,
+          'body' : null
+        });
   }
 }
 

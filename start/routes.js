@@ -37,6 +37,9 @@ Route.group(() => {
   Route.post('recipes/:id/photo', 'RecipeController.photoUpload')
   .middleware('auth:jwt')
 
+  Route.get('my-recipes', 'MyRecipeController.index')
+  .middleware('auth:jwt');
+
 }).prefix('/api/v1/')
 
 
