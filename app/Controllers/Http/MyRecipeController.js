@@ -26,6 +26,7 @@ class MyRecipeController {
       .query()
       .where('user_id', id)
       .with('category')
+      .with('tags')
       .fetch();
 
     if(allRecipe){

@@ -16,6 +16,12 @@ class Recipe extends Model {
     steps(){
         return this.hasMany('App/Models/RecipesStep')
     }
+
+    tags() {
+      return this
+        .belongsToMany('App/Models/Tag')
+        .pivotTable('recipe_tags');
+    }
 }
 
 module.exports = Recipe
