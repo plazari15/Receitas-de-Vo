@@ -16,6 +16,12 @@
 |     Also you can preload files by calling `preLoad('path/to/file')` method.
 |     Make sure to pass a relative path from the project root.
 */
+const tracer = require('dd-trace').init();
+
+tracer.init({
+  analytics: true
+})
+
 
 const { Ignitor } = require('@adonisjs/ignitor')
 
