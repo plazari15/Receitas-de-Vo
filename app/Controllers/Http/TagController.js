@@ -7,7 +7,7 @@
 /**
  * Resourceful controller for interacting with recipetags
  */
-class RecipeTagController {
+class TagController {
   /**
    * Show a list of all recipetags.
    * GET recipetags
