@@ -26,3 +26,4 @@ Run the following command to run startup migrations.
 ```js
 adonis migration:run
 ```
+https://search.pedrolazari.dev/receita-index/_search?q=name:Arroiz
