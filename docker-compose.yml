@@ -19,9 +19,21 @@ services:
     ports:
       - target: 3306
         published: 3306
+    networks:
+      - "receitavo"
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    networks:
+      - "receitavo"
 
 # volumes declaration.
 volumes:
   # mysql-data
   mysql-data:
     driver: local
+
+#networks
+networks:
+  receitavo:
