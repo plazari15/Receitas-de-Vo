@@ -5,6 +5,12 @@ const Model = use('Model')
 
 class Recipe extends Model {
 
+
+  static boot() {
+    super.boot();
+    this.addHook('afterCreate', 'RecipeHook.sendSearch');
+  }
+
     user(){
         return this.belongsTo('App/Models/User')
     }
