@@ -26,3 +26,5 @@ Run the following command to run startup migrations.
 ```js
 adonis migration:run
 ```
+RODAR ISSO NO HEROKU
+release: ENV_SILENT=true node ace migration:run --force
