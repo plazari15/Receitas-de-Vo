@@ -95,7 +95,7 @@ class RecipeController {
       return validation.messages();
     }
 
-    const {category_id, name, steps} = request.all();
+    const {category_id, name, steps, description} = request.all();
 
     if(await !auth.check()){
       return response
@@ -110,6 +110,7 @@ class RecipeController {
       "user_id" : auth.user.id,
       "category_id" : category_id,
       "name" : name,
+      "description" : description,
       "status" : "3"
     }
 
