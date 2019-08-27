@@ -1,14 +1,13 @@
-'use strict'
+'use strict';
 
-const cat = use('App/Models/Category')
+const cat = use('App/Models/Category');
 
 class CategoryController {
+  async getAll () {
+    const categories = cat.all();
 
-    async getAll() {
-        const categories = cat.all();
-
-        return categories;
-    }
+    return categories;
+  }
 }
 
-module.exports = CategoryController
+module.exports = CategoryController;
