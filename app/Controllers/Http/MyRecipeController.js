@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
@@ -20,7 +20,7 @@ class MyRecipeController {
    * @param {View} ctx.view
    */
   async index ({ request, response, auth }) {
-    const { id }  = auth.user;
+    const { id } = auth.user;
 
     const allRecipe = await Recipe
       .query()
@@ -29,24 +29,24 @@ class MyRecipeController {
       .with('tags')
       .fetch();
 
-    if(allRecipe){
+    if (allRecipe) {
       return response
         .status(200)
         .send({
-          'message' : "",
-          'success' : true,
-          'body' : allRecipe
+          message: '',
+          success: true,
+          body: allRecipe,
         });
     }
 
     return response
-        .status(404)
-        .send({
-          'message' : "Nenhuma receita encontrada",
-          'success' : false,
-          'body' : null
-        });
+      .status(404)
+      .send({
+        message: 'Nenhuma receita encontrada',
+        success: false,
+        body: null,
+      });
   }
 }
 
-module.exports = MyRecipeController
+module.exports = MyRecipeController;

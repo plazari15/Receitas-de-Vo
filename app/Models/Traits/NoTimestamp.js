@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 class NoTimestamp {
   register (Model) {
@@ -8,9 +8,9 @@ class NoTimestamp {
       },
       updatedAtColumn: {
         get: () => null,
-      }
-    })
+      },
+    });
   }
 }
 
-module.exports = NoTimestamp
+module.exports = NoTimestamp;
