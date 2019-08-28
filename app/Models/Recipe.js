@@ -1,27 +1,26 @@
-'use strict'
+'use strict';
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Model = use('Model')
+const Model = use('Model');
 
 class Recipe extends Model {
+  user () {
+    return this.belongsTo('App/Models/User');
+  }
 
-    user(){
-        return this.belongsTo('App/Models/User')
-    }
+  category () {
+    return this.belongsTo('App/Models/Category');
+  }
 
-    category(){
-        return this.belongsTo('App/Models/Category')
-    }
+  steps () {
+    return this.hasMany('App/Models/RecipesStep');
+  }
 
-    steps(){
-        return this.hasMany('App/Models/RecipesStep')
-    }
-
-    tags() {
-      return this
-        .belongsToMany('App/Models/Tag')
-        .pivotTable('recipe_tags');
-    }
+  tags () {
+    return this
+      .belongsToMany('App/Models/Tag')
+      .pivotTable('recipe_tags');
+  }
 }
 
-module.exports = Recipe
+module.exports = Recipe;

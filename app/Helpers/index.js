@@ -1,8 +1,8 @@
-'use strict'
+'use strict';
 
-const Recipe = use('App/Models/Recipe')
+const Recipe = use('App/Models/Recipe');
 
-var moment = require('moment');
+const moment = require('moment');
 
 
 const generatePhotoName = async (id, ext) => {
@@ -10,16 +10,14 @@ const generatePhotoName = async (id, ext) => {
 
   const recipeArr = recipe.name;
 
-  const Time = moment({}).unix()
+  const Time = moment({}).unix();
 
-  const RecipeSlug =  recipeArr.split(' ').join('-').toLowerCase();
+  const RecipeSlug = recipeArr.split(' ').join('-').toLowerCase();
 
-  return RecipeSlug + '-' + Time + '.' + ext;
-}
-
-
+  return `${RecipeSlug}-${Time}.${ext}`;
+};
 
 
 module.exports = {
-  generatePhotoName
-}
+  generatePhotoName,
+};

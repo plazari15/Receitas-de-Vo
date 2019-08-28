@@ -1,16 +1,14 @@
-'use strict'
+'use strict';
 
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
-const Model = use('Model')
+const Model = use('Model');
 
 class Tag extends Model {
-
-  recipes() {
+  recipes () {
     return this
       .belongsToMany('App/Models/Recipe')
       .pivotTable('recipe_tags');
   }
-
 }
 
-module.exports = Tag
+module.exports = Tag;
