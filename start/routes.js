@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 /*
 |--------------------------------------------------------------------------
@@ -14,37 +14,32 @@
 */
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
-const Route = use('Route')
+const Route = use('Route');
 
-require
-Route.get('/', () => {
-  return { greeting: 'Hello world in JSON WITH BUILD' }
-})
+Route.get('/', () => ({ greeting: 'Hello world in JSON WITH BUILD' }));
 
 Route.group(() => {
-  Route.post('/register', 'AuthController.register')
-  Route.post('/login', 'AuthController.authenticate')
-  Route.get('/user', 'AuthController.checkUser').middleware(['auth:jwt'])
-}).prefix('/api/v1/auth')
+  Route.post('/register', 'UserController.create');
+  Route.post('/login', 'AuthController.authenticate');
+  Route.get('/user', 'AuthController.checkUser').middleware(['auth:jwt']);
+}).prefix('/api/v1/auth');
 
 Route.group(() => {
-
   Route.resource('/recipes', 'RecipeController')
-  .apiOnly()
-  .middleware(new Map([
-    [['store', 'update', 'destroy'], ['auth:jwt']]
-  ]))
+    .apiOnly()
+    .middleware(new Map([
+      [['store', 'update', 'destroy'], ['auth:jwt']],
+    ]));
   Route.post('recipes/:id/photo', 'RecipeController.photoUpload')
-  .middleware('auth:jwt')
+    .middleware('auth:jwt');
 
   Route.get('my-recipes', 'MyRecipeController.index')
-  .middleware('auth:jwt');
-
-}).prefix('/api/v1/')
+    .middleware('auth:jwt');
+}).prefix('/api/v1/');
 
 
 Route.group(() => {
-  Route.get('/all', 'CategoryController.getAll')
-}).prefix('/api/v1/categories')
+  Route.get('/all', 'CategoryController.getAll');
+}).prefix('/api/v1/categories');
 
 // Route.post('/auth', 'AuthController.authenticate').middleware(['auth'])
