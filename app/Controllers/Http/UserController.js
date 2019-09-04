@@ -66,17 +66,6 @@ class UserController {
   }
 
   /**
-   * Create/save a new user.
-   * POST users
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, response }) {
-  }
-
-  /**
    * Display a single user.
    * GET users/:id
    *
@@ -91,20 +80,6 @@ class UserController {
   }
 
   /**
-   * Render a form to update an existing user.
-   * GET users/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({
-    params, request, response, view,
-  }) {
-  }
-
-  /**
    * Update user details.
    * PUT or PATCH users/:id
    *
@@ -112,7 +87,40 @@ class UserController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request, response }) {
+  async update ({
+    params, request, response, auth,
+  }) {
+    const { id } = auth.user;
+
+    const {
+      email, name, lastname,
+    } = request.all();
+
+    const user = await User.find(id);
+
+    user.email = email;
+    user.name = name;
+    user.lastname = lastname;
+
+    const newUser = await user.save();
+
+    console.log(newUser);
+
+    if (newUser) {
+      return response.status(200)
+        .json({
+          success: true,
+          message: 'Usuário atualizado com sucesso',
+          data: newUser,
+        });
+    }
+
+    return response.status(400)
+      .json({
+        success: false,
+        message: 'Sofremos algum problema. Tente de novo!',
+        data: null,
+      });
   }
 
   /**
