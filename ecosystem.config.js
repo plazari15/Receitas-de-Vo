@@ -24,7 +24,7 @@ module.exports = {
       ref  : 'origin/develop',
       repo : 'https://github.com/plazari15/Receitas-de-Vo.git',
       path : '/var/www/Receitas-de-Vo',
-      'post-deploy' : 'npm install && pm2 reload ecosystem.config.js'
+      'post-deploy' : 'pm2 reload ecosystem.config.js'
     }
   }
 };
