@@ -21,7 +21,7 @@ Route.get('/', () => ({ greeting: 'Hello world in JSON WITH BUILD' }));
 Route.group(() => {
   Route.post('/register', 'UserController.create');
   Route.post('/login', 'AuthController.authenticate');
-  Route.get('/user', 'AuthController.checkUser').middleware(['auth:jwt']);
+  Route.put('/user/update/:id', 'UserController.update').middleware(['auth:jwt']);
 }).prefix('/api/v1/auth');
 
 Route.group(() => {
