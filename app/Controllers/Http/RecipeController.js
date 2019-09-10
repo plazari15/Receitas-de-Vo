@@ -2,6 +2,7 @@
 
 const Recipe = use('App/Models/Recipe');
 const Steps = use('App/Models/RecipesStep');
+const Tag = use('App/Models/Tag');
 const Database = use('Database');
 const { validate } = use('Validator');
 const Driver = use('Drive');
@@ -80,18 +81,27 @@ class RecipeController {
     const rules = {
       category_id: 'required',
       name: 'required',
+      cover: 'required',
+      tags: 'required',
+      status: 'required',
     };
 
     const validation = await validate(request.all(), rules, {
       'category_id.required': 'Selecione uma categoria.',
       'name.required': 'Uma receita sem nome não funciona =(',
+      'cover.required': 'Envie uma foto.',
+      'tags.required': 'Selecione pelo menos 1 Tag',
+      'status.required': 'Selecione um status para sua receita',
+
     });
 
     if (validation.fails()) {
       return validation.messages();
     }
 
-    const { category_id, name, steps } = request.all();
+    const {
+      category_id, name, steps, cover, tags, status,
+    } = request.all();
 
     if (await !auth.check()) {
       return response
@@ -102,11 +112,28 @@ class RecipeController {
         });
     }
 
+    const typeImage = cover.split(';')[0].split('/')[1];
+    const imageName = await generatePhotoName(name, typeImage);
+    const Image = Buffer.from(cover.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+
+    if (await Driver.disk('s3').exists(imageName)) {
+      console.log('Existe');
+      await Driver.disk('s3').delete(imageName);
+    }
+
+    await Driver.disk('s3').put(imageName, Image, {
+      ACL: 'public-read',
+      Body: Image,
+      ContentEncoding: 'base64',
+      ContentType: `image/${typeImage}`,
+    });
+
     const data = {
       user_id: auth.user.id,
       category_id,
       name,
-      status: '3',
+      status,
+      photo: imageName,
     };
 
     const recipeCreated = await Recipe.create(data);
@@ -119,6 +146,22 @@ class RecipeController {
 
         await recipeCreated.steps().save(step);
       });
+    }
+
+    if (recipeCreated.id !== '') {
+      const tagsId = [];
+      tags.forEach(async element => {
+        const tagId = await Tag.findOrCreate({
+          name: element,
+        }, {
+          type: 'recipe',
+          name: element,
+        });
+
+        tagsId.push(tagId.id);
+      });
+
+      await recipeCreated.tags().sync(tagsId);
     }
 
 
