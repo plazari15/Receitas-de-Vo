@@ -116,11 +116,6 @@ class RecipeController {
     const imageName = await generatePhotoName(name, typeImage);
     const Image = Buffer.from(cover.replace(/^data:image\/\w+;base64,/, ''), 'base64');
 
-    if (await Driver.disk('s3').exists(imageName)) {
-      console.log('Existe');
-      await Driver.disk('s3').delete(imageName);
-    }
-
     await Driver.disk('s3').put(imageName, Image, {
       ACL: 'public-read',
       Body: Image,
