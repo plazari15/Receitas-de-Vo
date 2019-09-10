@@ -8,9 +8,15 @@ class Recipe extends Model {
     return this.belongsTo('App/Models/User');
   }
 
-  category () {
-    return this.belongsTo('App/Models/Category');
+
+  static boot() {
+    super.boot();
+    this.addHook('afterCreate', 'RecipeHook.sendSearch');
   }
+
+    user(){
+        return this.belongsTo('App/Models/User')
+    }
 
   steps () {
     return this.hasMany('App/Models/RecipesStep');
