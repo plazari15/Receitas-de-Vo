@@ -183,52 +183,6 @@ class RecipeController {
       });
   }
 
-  async photoUpload ({
-    params, request, response, auth,
-  }) {
-    const { id } = params;
-
-    if (id === undefined) {
-      return response
-        .status(404)
-        .send({
-          error: false,
-          message: 'Receita não encontrada. A Foto não pode ser adicionada',
-        });
-    }
-
-    const profilePic = request.multipart.file('photo', {
-      types: ['image'],
-      size: '2mb',
-    }, async file => {
-      const fileName = await generatePhotoName(id, file.extname);
-      const recipe = await Recipe.find(id);
-
-      if (recipe.photo !== null && await Driver.disk('s3').exists(recipe.photo)) {
-        console.log('Existe');
-        await Driver.disk('s3').delete(recipe.photo);
-      }
-
-      await Driver.disk('s3').put(fileName, file.stream, {
-        ACL: 'public-read',
-      });
-
-      recipe.photo = fileName;
-      recipe.save();
-
-      return true;
-    });
-
-    await request.multipart.process();
-
-    return response
-      .status(201)
-      .send({
-        error: false,
-        message: 'Foto inserida com sucesso!',
-      });
-  }
-
   /**
    * Display a single recipe.
    * GET recipes/:id
