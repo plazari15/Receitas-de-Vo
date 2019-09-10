@@ -11,7 +11,7 @@ class Recipe extends Model {
 
   static boot () {
     super.boot();
-    this.addHook('afterCreate', 'RecipeHook.sendSearch');
+    this.addHook('afterSave', 'RecipeHook.sendSearch');
   }
 
   category () {
@@ -25,7 +25,7 @@ class Recipe extends Model {
   tags () {
     return this
       .belongsToMany('App/Models/Tag')
-      .pivotTable('recipe_tags');
+      .pivotTable('recipe_tags', 'recipe_id', 'tag_id', 'id', 'id');
   }
 }
 
