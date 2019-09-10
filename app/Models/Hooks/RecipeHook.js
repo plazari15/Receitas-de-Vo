@@ -10,7 +10,7 @@ const AlgoliaIndex = Algolia.initIndex('recipes');
 RecipeHook.sendSearch = async recipe => {
   const recipeComplete = await Model.find(recipe.id);
 
-  if (recipeComplete.status != '1') {
+  if (recipe.status !== 1) {
     console.log('AQUI NÂO VAI PRO ALGOLIA');
     return true;
   }

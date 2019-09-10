@@ -203,7 +203,7 @@ class RecipeController {
 
   /**
    * Update recipe details.
-   * PUT or PATCH recipes/:id
+   * PUT or \PATCH recipes/:id
    *
    * @param {object} ctx
    * @param {Request} ctx.request
@@ -213,15 +213,17 @@ class RecipeController {
     params, request, response, auth,
   }) {
     const rules = {
-      id: 'required',
       category_id: 'required',
       name: 'required',
+      tags: 'required',
+      steps: 'required',
     };
 
     const validation = await validate(request.all(), rules, {
-      'id.required': 'Edite uma receita para começar',
       'category_id.required': 'Selecione uma categoria.',
       'name.required': 'Uma receita sem nome não funciona =(',
+      'tags.required': 'Insira as tags da sua receita',
+      'steps.required': 'Insira o passo a passo da sua receita',
     });
 
     if (validation.fails()) {
@@ -229,10 +231,10 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, id, photo,
+      category_id, name, steps, cover, tags, status,
     } = request.all();
 
-    const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', id).first();
+    const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', params.id).first();
 
     if (!getRecipe.id) {
       return response
@@ -246,18 +248,57 @@ class RecipeController {
     getRecipe.category_id = category_id;
     getRecipe.name = name;
     getRecipe.status = 2;
+    if (cover !== undefined) {
+      const typeImage = cover.split(';')[0].split('/')[1];
+      const imageName = await generatePhotoName(name, typeImage);
+      const Image = Buffer.from(cover.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+
+      await Driver.disk('s3').put(imageName, Image, {
+        ACL: 'public-read',
+        Body: Image,
+        ContentEncoding: 'base64',
+        ContentType: `image/${typeImage}`,
+      });
+
+      getRecipe.cover = imageName;
+    }
 
 
     if (await getRecipe.save()) {
       steps.forEach(async element => {
-        const step = await Steps.query().where('id', element.id).andWhere('recipe_id', id).first();
+        if (element.id !== undefined) {
+          const step = await Steps.query().where('id', element.id).andWhere('recipe_id', params.id).first();
 
-        step.order = element.order;
-        step.description = element.description;
+          step.order = element.order;
+          step.description = element.description;
 
-        await step.save();
+          await step.save();
+        } else {
+          const step = new Steps();
+          step.order = element.order;
+          step.description = element.description;
+
+          await getRecipe.steps().save(step);
+        }
       });
+
+      if (getRecipe.id !== '') {
+        const tagsId = [];
+        tags.forEach(async element => {
+          const tagId = await Tag.findOrCreate({
+            name: element,
+          }, {
+            type: 'recipe',
+            name: element,
+          });
+
+          tagsId.push(tagId.id);
+        });
+
+        await getRecipe.tags().sync(tagsId);
+      }
     }
+
 
     getRecipe.reload();
     return getRecipe;
