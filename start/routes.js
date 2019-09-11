@@ -41,6 +41,10 @@ Route.group(() => {
 
 
 Route.group(() => {
+  Route.get('/', 'DiscoverController.index');
+}).prefix('/api/v1/discover');
+
+Route.group(() => {
   Route.get('/all', 'CategoryController.getAll');
 }).prefix('/api/v1/categories');
 

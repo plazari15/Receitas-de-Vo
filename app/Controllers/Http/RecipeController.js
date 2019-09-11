@@ -373,6 +373,13 @@ class RecipeController {
           message: 'Oppss! Você tentou excluir um passo de receita que não pertence a você.',
         });
     }
+
+    return response
+      .status(500)
+      .send({
+        error: true,
+        message: 'Erro Geral',
+      });
   }
 }
 
