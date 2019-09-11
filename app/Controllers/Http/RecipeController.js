@@ -231,7 +231,7 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, cover, tags, status,
+      category_id, name, steps, cover, tags, status, description,
     } = request.all();
 
     const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', params.id).first();
@@ -247,7 +247,8 @@ class RecipeController {
 
     getRecipe.category_id = category_id;
     getRecipe.name = name;
-    getRecipe.status = 2;
+    getRecipe.status = status;
+    getRecipe.description = description;
     if (cover !== undefined) {
       const typeImage = cover.split(';')[0].split('/')[1];
       const imageName = await generatePhotoName(name, typeImage);
