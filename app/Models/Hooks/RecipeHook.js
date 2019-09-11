@@ -11,8 +11,37 @@ const AlgoliaIndex = Algolia.initIndex('recipes');
 RecipeHook.sendSearch = async recipe => {
   const recipeComplete = await Model.find(recipe.id);
 
-  if (recipe.status !== 1) {
-    console.log('AQUI NÂO VAI PRO ALGOLIA');
+  if (recipe.status != 1 && recipe.algolia_id != null) {
+    try {
+      AlgoliaIndex.deleteObject(recipe.algolia_id, (err, content) => {
+        if (err !== undefined) {
+          console.log(err);
+        }
+
+        recipe.algolia_id = null;
+        recipe.save();
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  } else if (recipe.status != 1) {
+    return true;
+  }
+
+  if (recipe.privacy == 2 && recipe.algolia_id !== null) {
+    console.log('deve deletar');
+    AlgoliaIndex.deleteObject(recipe.algolia_id, (err, content) => {
+      if (err !== undefined) {
+        console.log(err);
+      }
+
+      recipe.algolia_id = null;
+      recipe.save();
+    });
+  }
+
+  if (recipe.privacy == 2) {
+    console.log('nem envia para algolia');
     return true;
   }
 
@@ -23,7 +52,7 @@ RecipeHook.sendSearch = async recipe => {
   const arrayTags = [];
 
   const AlgoliaObj = {
-    objectID: recipe.algolia_id,
+    objectID: (recipe.algolia_id == null ? '' : recipe.algolia_id),
     id: recipe.id,
     post_date: recipe.created_at,
     name: recipe.name,
@@ -35,7 +64,7 @@ RecipeHook.sendSearch = async recipe => {
     tags: arrayTags,
   };
 
-  if (recipe.algolia_id != undefined) {
+  if (recipe.algolia_id != undefined || recipe.algolia_id != null) {
     AlgoliaIndex.saveObject(AlgoliaObj, err => {
       if (err) {
         console.log('Erro no Algolia');
@@ -59,6 +88,8 @@ RecipeHook.sendSearch = async recipe => {
       }
     });
   }
+
+  return true;
 };
 
 RecipeHook.deleteRecipe = async recipe => {

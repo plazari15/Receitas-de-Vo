@@ -13,63 +13,6 @@ const { generatePhotoName } = use('App/Helpers');
  */
 class RecipeController {
   /**
-   * Show a list of all recipes.
-   * GET recipes
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response }) {
-    const { type, content } = request.all();
-
-    let data = [];
-
-    switch (type) {
-      case 'category':
-        data = await Recipe
-          .query()
-          .where('category_id', content)
-          .with('user')
-          .with('tags')
-          .fetch();
-        break;
-
-      case 'term':
-        data = await Recipe
-          .query()
-          .where('name', 'LIKE', content)
-          .with('user')
-          .with('tags')
-          .fetch();
-        break;
-
-      default:
-        data = await Recipe
-          .query()
-          .with('user')
-          .with('tags')
-          .fetch();
-        break;
-    }
-
-    if (data.length <= 0) {
-      return response.status(404).send({
-        success: false,
-        message: 'Nada encontrado. Tente novamente',
-        body: data,
-      });
-    }
-
-    return response.status(200).send({
-      success: true,
-      message: null,
-      body: data,
-    });
-  }
-
-  /**
    * Create/save a new recipe.
    * POST recipes
    *
@@ -84,6 +27,7 @@ class RecipeController {
       cover: 'required',
       tags: 'required',
       status: 'required',
+      privacy: 'required',
     };
 
     const validation = await validate(request.all(), rules, {
@@ -92,6 +36,7 @@ class RecipeController {
       'cover.required': 'Envie uma foto.',
       'tags.required': 'Selecione pelo menos 1 Tag',
       'status.required': 'Selecione um status para sua receita',
+      'privacy.required': 'PRIVACy é um campo obrigatório, 1 = publico / 2 = privado',
 
     });
 
@@ -100,7 +45,7 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, cover, tags, status,
+      category_id, name, steps, cover, tags, status, privacy,
     } = request.all();
 
     if (await !auth.check()) {
@@ -108,7 +53,7 @@ class RecipeController {
         .status(401)
         .send({
           error: true,
-          message: 'Somente usuários logados podem enviar',
+          message: 'Somente usuários logados podem enviar receitas',
         });
     }
 
@@ -129,6 +74,7 @@ class RecipeController {
       name,
       status,
       photo: imageName,
+      privacy,
     };
 
     const recipeCreated = await Recipe.create(data);
@@ -217,6 +163,7 @@ class RecipeController {
       name: 'required',
       tags: 'required',
       steps: 'required',
+      privacy: 'required',
     };
 
     const validation = await validate(request.all(), rules, {
@@ -224,6 +171,7 @@ class RecipeController {
       'name.required': 'Uma receita sem nome não funciona =(',
       'tags.required': 'Insira as tags da sua receita',
       'steps.required': 'Insira o passo a passo da sua receita',
+      'privacy.required': 'Defina a privacidade da sua receita',
     });
 
     if (validation.fails()) {
@@ -231,7 +179,7 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, cover, tags, status, description,
+      category_id, name, steps, cover, tags, status, description, privacy,
     } = request.all();
 
     const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', params.id).first();
@@ -249,6 +197,7 @@ class RecipeController {
     getRecipe.name = name;
     getRecipe.status = status;
     getRecipe.description = description;
+    getRecipe.privacy = privacy;
     if (cover !== undefined) {
       const typeImage = cover.split(';')[0].split('/')[1];
       const imageName = await generatePhotoName(name, typeImage);
