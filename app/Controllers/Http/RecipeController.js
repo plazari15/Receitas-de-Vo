@@ -344,6 +344,36 @@ class RecipeController {
         });
     }
   }
+
+  async deleteStep ({ params, response, auth }) {
+    const { id, recipe_id } = params;
+
+    try {
+      const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', recipe_id).first();
+
+      const step = await Steps.query()
+        .where('id', id)
+        .andWhere('recipe_id', recipe_id)
+        .first();
+
+      if (step.delete()) {
+        return response
+          .status(200)
+          .send({
+            error: false,
+            message: 'Ok! Passo excluído!',
+          });
+      }
+    } catch (e) {
+      console.log(e.message);
+      return response
+        .status(404)
+        .send({
+          error: true,
+          message: 'Oppss! Você tentou excluir um passo de receita que não pertence a você.',
+        });
+    }
+  }
 }
 
 module.exports = RecipeController;
