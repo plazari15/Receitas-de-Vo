@@ -12,6 +12,7 @@ class Recipe extends Model {
   static boot () {
     super.boot();
     this.addHook('afterSave', 'RecipeHook.sendSearch');
+    this.addHook('afterDelete', 'RecipeHook.deleteRecipe');
   }
 
   category () {

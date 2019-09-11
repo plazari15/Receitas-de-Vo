@@ -4,6 +4,7 @@ const RecipeHook = module.exports;
 
 const Model = use('App/Models/Recipe');
 const Algolia = use('App/Services/Algolia');
+const Driver = use('Drive');
 
 const AlgoliaIndex = Algolia.initIndex('recipes');
 
@@ -57,5 +58,21 @@ RecipeHook.sendSearch = async recipe => {
         console.log(e);
       }
     });
+  }
+};
+
+RecipeHook.deleteRecipe = async recipe => {
+  console.log(recipe);
+
+  if (recipe.algolia_id != null) {
+    AlgoliaIndex.deleteObject(recipe.algolia_id, (err, content) => {
+      if (err !== undefined) {
+        console.log(err);
+      }
+    });
+  }
+
+  if (recipe.photo !== null) {
+    await Driver.disk('s3').delete(recipe.photo);
   }
 };
