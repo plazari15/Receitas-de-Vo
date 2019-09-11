@@ -5,23 +5,13 @@ const AlgoliaIndex = Algolia.initIndex('recipes');
 
 class DiscoverController {
   async index ({ request, response, auth }) {
-    const { search } = request.all();
+    const { search, hitsPerPage, page } = request.all();
 
-    const allRecipes = {};
-
-    AlgoliaIndex.search({
-      query: '',
-      hitsPerPage: 2,
-    },
-    (err, { hits } = {}) => {
-      if (err) throw err;
-
-      console.log(hits);
-
-      allRecipes = hits;
-    });
-
-    return response.send({ allRecipes });
+    await AlgoliaIndex.search({
+      query: (search == null ? '' : search),
+      hitsPerPage: (hitsPerPage == null ? 10 : hitsPerPage),
+      page: (page == null ? 1 : page),
+    }).then(({ hits } = {}) => response.send({ hits }));
   }
 }
 
