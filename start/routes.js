@@ -18,26 +18,31 @@ const Route = use('Route');
 
 Route.get('/', () => ({ greeting: 'Hello world in PM2' }));
 
+// Autenticação
 Route.group(() => {
   Route.post('/register', 'UserController.create');
   Route.post('/login', 'AuthController.authenticate');
   Route.put('/user/update/:id', 'UserController.update').middleware(['auth:jwt']);
 }).prefix('/api/v1/auth');
 
+// Receitas
 Route.group(() => {
-  Route.resource('/recipes', 'RecipeController')
+  Route.resource('/', 'RecipeController')
     .apiOnly()
     .middleware(new Map([
       [['store', 'update', 'destroy'], ['auth:jwt']],
     ]));
-  Route.post('recipes/:id/photo', 'RecipeController.photoUpload')
-    .middleware('auth:jwt');
 
-  Route.get('my-recipes', 'MyRecipeController.index')
-    .middleware('auth:jwt');
-}).prefix('/api/v1/');
+  // Apagar Passos da receita
+  Route.delete('/step/:recipe_id/:id', 'RecipeController.deleteStep').middleware('auth:jwt');
+}).prefix('/api/v1/recipes');
 
+// Discover de Receitas
+Route.group(() => {
+  Route.get('/', 'DiscoverController.index');
+}).prefix('/api/v1/discover');
 
+// Todas as Categorias
 Route.group(() => {
   Route.get('/all', 'CategoryController.getAll');
 }).prefix('/api/v1/categories');

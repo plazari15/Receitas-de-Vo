@@ -8,6 +8,13 @@ class Recipe extends Model {
     return this.belongsTo('App/Models/User');
   }
 
+
+  static boot () {
+    super.boot();
+    this.addHook('afterSave', 'RecipeHook.sendSearch');
+    this.addHook('afterDelete', 'RecipeHook.deleteRecipe');
+  }
+
   category () {
     return this.belongsTo('App/Models/Category');
   }
@@ -19,7 +26,7 @@ class Recipe extends Model {
   tags () {
     return this
       .belongsToMany('App/Models/Tag')
-      .pivotTable('recipe_tags');
+      .pivotTable('recipe_tags', 'recipe_id', 'tag_id', 'id', 'id');
   }
 }
 

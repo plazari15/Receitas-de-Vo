@@ -5,10 +5,8 @@ const Recipe = use('App/Models/Recipe');
 const moment = require('moment');
 
 
-const generatePhotoName = async (id, ext) => {
-  const recipe = await Recipe.find(id);
-
-  const recipeArr = recipe.name;
+const generatePhotoName = async (name, ext) => {
+  const recipeArr = name;
 
   const Time = moment({}).unix();
 
