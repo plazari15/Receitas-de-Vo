@@ -340,7 +340,7 @@ class RecipeController {
         .status(404)
         .send({
           error: true,
-          message: 'Oppss! A receita que você está tentando excluir não parece ser sua!',
+          message: 'Oppss! A receita que você está tentando excluir não foi encontrada em sua conta!',
         });
     }
   }
