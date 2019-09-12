@@ -23,6 +23,7 @@ class RecipeController {
   async store ({ request, response, auth }) {
     const rules = {
       category_id: 'required',
+      prepare: 'required',
       name: 'required',
       cover: 'required',
       tags: 'required',
@@ -32,6 +33,7 @@ class RecipeController {
 
     const validation = await validate(request.all(), rules, {
       'category_id.required': 'Selecione uma categoria.',
+      'prepare.required': 'Insira o tempo de preparo em minutos',
       'name.required': 'Uma receita sem nome não funciona =(',
       'cover.required': 'Envie uma foto.',
       'tags.required': 'Selecione pelo menos 1 Tag',
@@ -45,7 +47,7 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, cover, tags, status, privacy,
+      category_id, name, steps, cover, tags, status, privacy, prepare,
     } = request.all();
 
     if (await !auth.check()) {
@@ -75,6 +77,7 @@ class RecipeController {
       status,
       photo: imageName,
       privacy,
+      prepare_time: prepare,
     };
 
     const recipeCreated = await Recipe.create(data);
@@ -164,6 +167,7 @@ class RecipeController {
       tags: 'required',
       steps: 'required',
       privacy: 'required',
+      prepare: 'required',
     };
 
     const validation = await validate(request.all(), rules, {
@@ -172,6 +176,7 @@ class RecipeController {
       'tags.required': 'Insira as tags da sua receita',
       'steps.required': 'Insira o passo a passo da sua receita',
       'privacy.required': 'Defina a privacidade da sua receita',
+      'prepare.required': 'Defina o tempo de preparo',
     });
 
     if (validation.fails()) {
@@ -179,7 +184,7 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, cover, tags, status, description, privacy,
+      category_id, name, steps, cover, tags, status, description, privacy, prepare,
     } = request.all();
 
     const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', params.id).first();
@@ -198,6 +203,7 @@ class RecipeController {
     getRecipe.status = status;
     getRecipe.description = description;
     getRecipe.privacy = privacy;
+    getRecipe.prepare_time = prepare;
     if (cover !== undefined) {
       const typeImage = cover.split(';')[0].split('/')[1];
       const imageName = await generatePhotoName(name, typeImage);
