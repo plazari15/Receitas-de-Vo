@@ -29,6 +29,7 @@ class RecipeController {
       tags: 'required',
       status: 'required',
       privacy: 'required',
+      'ingredients.*.name': 'required',
     };
 
     const validation = await validate(request.all(), rules, {
@@ -39,6 +40,7 @@ class RecipeController {
       'tags.required': 'Selecione pelo menos 1 Tag',
       'status.required': 'Selecione um status para sua receita',
       'privacy.required': 'PRIVACy é um campo obrigatório, 1 = publico / 2 = privado',
+      'ingredients.*.name.required': 'Insira o nome dos ingredientes',
 
     });
 
