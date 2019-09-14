@@ -5,7 +5,7 @@ const Model = use('Model');
 
 class RecipesIngredient extends Model {
   static get table () {
-    return 'recipes_ingredients';
+    return 'recipe_ingredients';
   }
 }
 
