@@ -380,6 +380,43 @@ class RecipeController {
         message: 'Erro Geral',
       });
   }
+
+  async deleteIngredient ({ params, response, auth }) {
+    const { id, recipe_id } = params;
+
+    try {
+      const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', recipe_id).first();
+
+      const ingredient = await Ingredientes.query()
+        .where('id', id)
+        .andWhere('recipe_id', recipe_id)
+        .first();
+
+      if (ingredient.delete()) {
+        return response
+          .status(200)
+          .send({
+            error: false,
+            message: 'Ok! Ingrediente excluído!',
+          });
+      }
+    } catch (e) {
+      console.log(e.message);
+      return response
+        .status(404)
+        .send({
+          error: true,
+          message: 'Oppss! Você tentou excluir um Ingrediente de uma receita que não pertence a você.',
+        });
+    }
+
+    return response
+      .status(500)
+      .send({
+        error: true,
+        message: 'Erro Geral',
+      });
+  }
 }
 
 module.exports = RecipeController;
