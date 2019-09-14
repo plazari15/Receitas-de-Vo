@@ -57,6 +57,7 @@ RecipeHook.sendSearch = async recipe => {
     post_date: recipe.created_at,
     name: recipe.name,
     description: recipe.description,
+    prepare: recipe.prepare_time,
     user_name: recipeUser.name,
     username: recipeUser.username,
     category_name: recipeCategory.name,

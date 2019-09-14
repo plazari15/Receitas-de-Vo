@@ -3,6 +3,7 @@
 const Recipe = use('App/Models/Recipe');
 const Steps = use('App/Models/RecipesStep');
 const Tag = use('App/Models/Tag');
+const Ingredientes = use('App/Models/RecipesIngredient');
 const Database = use('Database');
 const { validate } = use('Validator');
 const Driver = use('Drive');
@@ -23,20 +24,28 @@ class RecipeController {
   async store ({ request, response, auth }) {
     const rules = {
       category_id: 'required',
+      prepare: 'required',
       name: 'required',
       cover: 'required',
       tags: 'required',
       status: 'required',
       privacy: 'required',
+      'ingredients.*.name': 'required',
+      'ingredients.*.quantity': 'required',
+      'ingredients.*.measure_id': 'required',
     };
 
     const validation = await validate(request.all(), rules, {
       'category_id.required': 'Selecione uma categoria.',
+      'prepare.required': 'Insira o tempo de preparo em minutos',
       'name.required': 'Uma receita sem nome não funciona =(',
       'cover.required': 'Envie uma foto.',
       'tags.required': 'Selecione pelo menos 1 Tag',
       'status.required': 'Selecione um status para sua receita',
       'privacy.required': 'PRIVACy é um campo obrigatório, 1 = publico / 2 = privado',
+      'ingredients.*.name.required': 'Insira o nome dos ingredientes',
+      'ingredients.*.quantity.required': 'Insira a quantidade dos ingredientes',
+      'ingredients.*.measure_id.required': 'Insira uma unidade de medida para o ingrediente',
 
     });
 
@@ -45,7 +54,7 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, cover, tags, status, privacy,
+      category_id, name, steps, cover, tags, status, privacy, prepare, ingredients,
     } = request.all();
 
     if (await !auth.check()) {
@@ -75,6 +84,7 @@ class RecipeController {
       status,
       photo: imageName,
       privacy,
+      prepare_time: prepare,
     };
 
     const recipeCreated = await Recipe.create(data);
@@ -86,6 +96,17 @@ class RecipeController {
         step.description = element.description;
 
         await recipeCreated.steps().save(step);
+      });
+    }
+
+    if (recipeCreated.id !== '') {
+      ingredients.forEach(async element => {
+        const ing = new Ingredientes();
+        ing.name = element.name;
+        ing.quantity = element.quantity;
+        ing.measure_id = element.measure_id;
+
+        await recipeCreated.ingredients().save(ing);
       });
     }
 
@@ -164,6 +185,10 @@ class RecipeController {
       tags: 'required',
       steps: 'required',
       privacy: 'required',
+      prepare: 'required',
+      'ingredients.*.name': 'required',
+      'ingredients.*.quantity': 'required',
+      'ingredients.*.measure_id': 'required',
     };
 
     const validation = await validate(request.all(), rules, {
@@ -172,6 +197,10 @@ class RecipeController {
       'tags.required': 'Insira as tags da sua receita',
       'steps.required': 'Insira o passo a passo da sua receita',
       'privacy.required': 'Defina a privacidade da sua receita',
+      'prepare.required': 'Defina o tempo de preparo',
+      'ingredients.*.name.required': 'Insira o nome dos ingredientes',
+      'ingredients.*.quantity.required': 'Insira a quantidade dos ingredientes',
+      'ingredients.*.measure_id.required': 'Insira uma unidade de medida para o ingrediente',
     });
 
     if (validation.fails()) {
@@ -179,7 +208,7 @@ class RecipeController {
     }
 
     const {
-      category_id, name, steps, cover, tags, status, description, privacy,
+      category_id, name, steps, cover, tags, status, description, privacy, prepare, ingredients,
     } = request.all();
 
     const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', params.id).first();
@@ -198,6 +227,7 @@ class RecipeController {
     getRecipe.status = status;
     getRecipe.description = description;
     getRecipe.privacy = privacy;
+    getRecipe.prepare_time = prepare;
     if (cover !== undefined) {
       const typeImage = cover.split(';')[0].split('/')[1];
       const imageName = await generatePhotoName(name, typeImage);
@@ -229,6 +259,26 @@ class RecipeController {
           step.description = element.description;
 
           await getRecipe.steps().save(step);
+        }
+      });
+
+
+      ingredients.forEach(async element => {
+        if (element.id !== undefined) {
+          const ingcreated = await Ingredientes.query().where('id', element.id).andWhere('recipe_id', params.id).first();
+
+          ingcreated.name = element.name;
+          ingcreated.quantity = element.quantity;
+          ingcreated.measure_id = element.measure_id;
+
+          ingcreated.save();
+        } else {
+          const ing = new Ingredientes();
+          ing.name = element.name;
+          ing.quantity = element.quantity;
+          ing.measure_id = element.measure_id;
+
+          await getRecipe.ingredients().save(ing);
         }
       });
 
@@ -320,6 +370,43 @@ class RecipeController {
         .send({
           error: true,
           message: 'Oppss! Você tentou excluir um passo de receita que não pertence a você.',
+        });
+    }
+
+    return response
+      .status(500)
+      .send({
+        error: true,
+        message: 'Erro Geral',
+      });
+  }
+
+  async deleteIngredient ({ params, response, auth }) {
+    const { id, recipe_id } = params;
+
+    try {
+      const getRecipe = await Recipe.query().where('user_id', auth.user.id).andWhere('id', recipe_id).first();
+
+      const ingredient = await Ingredientes.query()
+        .where('id', id)
+        .andWhere('recipe_id', recipe_id)
+        .first();
+
+      if (ingredient.delete()) {
+        return response
+          .status(200)
+          .send({
+            error: false,
+            message: 'Ok! Ingrediente excluído!',
+          });
+      }
+    } catch (e) {
+      console.log(e.message);
+      return response
+        .status(404)
+        .send({
+          error: true,
+          message: 'Oppss! Você tentou excluir um Ingrediente de uma receita que não pertence a você.',
         });
     }
 
