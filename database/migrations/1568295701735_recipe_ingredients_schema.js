@@ -3,9 +3,9 @@
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema');
 
-class RecipeTagsSchema extends Schema {
+class RecipeIngredientsSchema extends Schema {
   up () {
-    this.create('recipe_tags', table => {
+    this.create('recipe_ingredients', table => {
       table.increments();
       table.integer('recipe_id')
         .unsigned()
@@ -13,19 +13,19 @@ class RecipeTagsSchema extends Schema {
         .inTable('recipes')
         .onUpdate('CASCADE')
         .onDelete('CASCADE');
-      table.integer('tag_id')
+      table.integer('measure_id')
         .unsigned()
         .references('id')
-        .inTable('tags')
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE');
+        .inTable('measures');
+      table.string('name').notNullable();
+      table.float('quantity', [10, 2]).notNullable();
       table.timestamps();
     });
   }
 
   down () {
-    this.drop('recipe_tags');
+    this.drop('recipe_ingredients');
   }
 }
 
-module.exports = RecipeTagsSchema;
+module.exports = RecipeIngredientsSchema;

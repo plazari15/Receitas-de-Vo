@@ -35,6 +35,7 @@ Route.group(() => {
 
   // Apagar Passos da receita
   Route.delete('/step/:recipe_id/:id', 'RecipeController.deleteStep').middleware('auth:jwt');
+  Route.delete('/ingredients/:recipe_id/:id', 'RecipeController.deleteIngredient').middleware('auth:jwt');
 }).prefix('/api/v1/recipes');
 
 // Discover de Receitas

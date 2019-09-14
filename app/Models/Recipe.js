@@ -23,6 +23,10 @@ class Recipe extends Model {
     return this.hasMany('App/Models/RecipesStep');
   }
 
+  ingredients () {
+    return this.hasMany('App/Models/RecipesIngredient');
+  }
+
   tags () {
     return this
       .belongsToMany('App/Models/Tag')
